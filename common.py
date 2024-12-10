@@ -68,14 +68,16 @@ def cumulative_integral(f_x,left,right,N=2049):
     return get_integral,x,cumulative
 
 def cached_approx_integral(f):
-    saved_integrals = {}
+    x_max = [0]
+    saved_integral = []
     def get_integral(x,a):
         x_min = 0
-        x_max = np.max(x)
-        key = (x_min,x_max,a)
-        if key not in saved_integrals.keys():
-            saved_integrals[key] = cumulative_integral(lambda t: f(t,a),x_min,x_max)[0]
-        return saved_integrals[key](x)
+        x_max_ = np.max(x)
+        return cumulative_integral(lambda t: f(t,a),x_min,x_max_)[0](x)
+        if x_max_>=x_max[0] or len(saved_integral)==0:
+            saved_integral.append(cumulative_integral(lambda t: f(t,a),x_min,x_max_)[0])
+            x_max[0]=x_max_
+        return saved_integral[0](x)
     return get_integral
 
 class InhomogeneousLinearDifferentialEquation:
