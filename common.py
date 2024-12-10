@@ -9,7 +9,6 @@ class TimeoutException(Exception):
 def timeout_handler(signum, frame):
     raise TimeoutException("Analytic integration exceeded time limit.")
 
-
 def simpson_coefficients(left, right, N):
     if N % 2 == 0:
         raise ValueError("N must be odd for Simpson's rule")
@@ -26,7 +25,8 @@ def simpson_coefficients(left, right, N):
     coef[0] = coef[-1] = h / 3    # Set first and last to h/3
     
     return x, coef
-def cumulative_integral(f_x,left,right,N=2049):
+
+def cumulative_integral(f_x,left,right,N=1025):
     """
     Compute cumulative integral values over the range [x[0], x[-1]].
 
@@ -67,17 +67,13 @@ def cumulative_integral(f_x,left,right,N=2049):
         return cumulative[index]
     return get_integral,x,cumulative
 
-def cached_approx_integral(f):
+def approx_integral_with_param(f):
     x_max = [0]
     saved_integral = []
     def get_integral(x,a):
         x_min = 0
         x_max_ = np.max(x)
         return cumulative_integral(lambda t: f(t,a),x_min,x_max_)[0](x)
-        if x_max_>=x_max[0] or len(saved_integral)==0:
-            saved_integral.append(cumulative_integral(lambda t: f(t,a),x_min,x_max_)[0])
-            x_max[0]=x_max_
-        return saved_integral[0](x)
     return get_integral
 
 class InhomogeneousLinearDifferentialEquation:
@@ -112,13 +108,13 @@ class InhomogeneousLinearDifferentialEquation:
                 print(f"Timeout occurred during analytic integration of {f}. Using approximate integration.")
                 signal.alarm(0)
                 integral_expr = lambdify("t,a", integral_expr)
-                integral_num.append(cached_approx_integral(integral_expr))
+                integral_num.append(approx_integral_with_param(integral_expr))
             except Exception as e:
                 print(f"Failed to build analytic integral of {f}")
                 print(e)
                 print("will use approximate integration")
                 integral_expr=lambdify("t,a",integral_expr)
-                integral_num.append(cached_approx_integral(integral_expr))
+                integral_num.append(approx_integral_with_param(integral_expr))
             signal.alarm(0)
 
         self.integral=lambda t,a: np.stack([i(t,a) for i in integral_num])
