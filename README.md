@@ -1,4 +1,5 @@
 Small chatgpt review of my code with additional math i provided it
+
 The provided Python code solves a system of inhomogeneous linear differential equations of the form:
 
 $$\dot{X}(t) = A X(t) + f(t)$$
