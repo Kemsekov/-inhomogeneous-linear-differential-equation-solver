@@ -70,7 +70,7 @@ def cumulative_integral(f_x,left,right,N=2049):
 def cached_approx_integral(f):
     saved_integrals = {}
     def get_integral(x,a):
-        x_min = np.min(x)
+        x_min = 0
         x_max = np.max(x)
         key = (x_min,x_max,a)
         if key not in saved_integrals.keys():
